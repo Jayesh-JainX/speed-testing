@@ -6,7 +6,7 @@ const cors = require("cors");
 const app = express();
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors({ origin: "https://speed-test-ic.vercel.app/" }));
+app.use(cors());
 
 const speedtest = new FastSpeedtest({
   token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm",
