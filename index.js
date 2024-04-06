@@ -10,11 +10,7 @@ app.use(cors());
 
 const speedtest = new FastSpeedtest({
   token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm",
-  verbose: false,
   timeout: 5000,
-  https: true,
-  urlCount: 5,
-  bufferSize: 8,
   unit: FastSpeedtest.UNITS.Mbps,
 });
 
