@@ -6,14 +6,24 @@ const cors = require("cors");
 const app = express();
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors());
+
+app.use(
+  cors({
+    origin: "https://speed-test-ic.vercel.app",
+  })
+);
 
 const speedtest = new FastSpeedtest({
   token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm",
+  verbose: false,
   timeout: 5000,
+  https: true,
+  urlCount: 5,
+  bufferSize: 8,
   unit: FastSpeedtest.UNITS.Mbps,
 });
 
+// Define the endpoint to fetch speed
 app.get("/speed", (req, res) => {
   speedtest
     .getSpeed()
