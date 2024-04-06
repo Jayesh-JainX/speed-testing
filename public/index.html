@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speed Test</title>
+
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
+
+    <link rel="preload" href="images/speed.png" as="image" />
+    <link rel="preload" href="images/heart.gif" as="image" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Internet Speed Test | SpeedTest.com" />
+    <meta
+      property="og:description"
+      content="How fast is your download speed? In seconds, SpeedTest.com's simple Internet speed test will estimate your ISP speed."
+    />
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="toggle">
+        <input class="toggle-input" type="checkbox" />
+        <div class="toggle-bg"></div>
+        <div class="toggle-switch">
+          <div class="toggle-switch-figure"></div>
+          <div class="toggle-switch-figureAlt"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <img
+        class="head_img"
+        src="images/speed.png"
+        alt="Your Image Description"
+      />
+      <div class="speed_info">
+        <div class="download_speed">
+          Download Speed: <br /><span class="speed_number">100</span>
+          <span class="bps">Mbps</span>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Made with
+      <span style="color: red"
+        ><img src="images/heart.gif" style="height: 13px; width: 13px"
+      /></span>
+      by
+      <span
+        style="
+          font-family: monospace;
+          font-size: 20px;
+          font-weight: bolder;
+          color: red;
+        "
+        >Jayesh Jain</span
+      >
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
