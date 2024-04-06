@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const speedtest = new FastSpeedtest({
   token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm",
   verbose: false,
-  timeout: 5000, // default: 5000
+  timeout: 5000,
   https: true,
   urlCount: 5,
   bufferSize: 8,
