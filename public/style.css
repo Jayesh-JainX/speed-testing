@@ -11,13 +11,23 @@ body {
 
 .speed_info {
   display: flex;
+  flex-direction: column;
   font-family: "Poppins", sans-serif;
-  justify-content: center;
   align-items: center;
   padding-top: 55px;
   position: relative;
   text-align: center;
   width: 100%;
+}
+
+.check_speed_button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  text-decoration: none;
+  font-size: 50px;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
 .wrapper {

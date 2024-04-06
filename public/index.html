@@ -7,10 +7,12 @@
 
     <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
-
     <link rel="preload" href="images/speed.png" as="image" />
     <link rel="preload" href="images/heart.gif" as="image" />
-
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Internet Speed Test | SpeedTest.com" />
     <meta
@@ -18,7 +20,6 @@
       content="How fast is your download speed? In seconds, SpeedTest.com's simple Internet speed test will estimate your ISP speed."
     />
   </head>
-
   <body>
     <div class="wrapper">
       <div class="toggle">
@@ -42,6 +43,12 @@
           Download Speed: <br /><span class="speed_number">100</span>
           <span class="bps">Mbps</span>
         </div>
+        <div class="loading_indicator" style="display: none">
+          <img src="images/loading2.gif" alt="Loading Indicator" />
+        </div>
+        <button class="check_speed_button">
+          <i class="bx bx-refresh"></i>
+        </button>
       </div>
     </div>
 
