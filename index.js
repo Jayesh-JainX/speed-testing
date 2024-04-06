@@ -1,15 +1,20 @@
 const express = require("express");
 const path = require("path");
 const FastSpeedtest = require("fast-speedtest-api");
+const cors = require("cors");
 
 const app = express();
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors({ origin: "https://speed-test-ic.vercel.app" }));
+app.use(cors({ origin: "https://speed-test-ic.vercel.app/" }));
 
 const speedtest = new FastSpeedtest({
   token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm",
+  verbose: false,
   timeout: 5000,
+  https: true,
+  urlCount: 5,
+  bufferSize: 8,
   unit: FastSpeedtest.UNITS.Mbps,
 });
 
@@ -18,7 +23,7 @@ app.get("/speed", (req, res) => {
     .getSpeed()
     .then((speed) => {
       console.log(`Speed: ${speed} Mbps`);
-      res.json({ speed: speed.toFixed(2) }); // Limit speed to two decimal places
+      res.json({ speed: parseFloat(speed.toFixed(2)) });
     })
     .catch((error) => {
       console.error("Error fetching speed:", error.message);
