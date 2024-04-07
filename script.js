@@ -8,6 +8,9 @@ const speedUnit = document.querySelector(".bps");
 const checkSpeedButton = document.querySelector(".check_speed_button");
 const downloadSpeedDisplay = document.getElementById("downloadSpeed");
 
+let highestSpeed = 0;
+let successfulTests = 0;
+
 function setInitialMode() {
   const prefersDarkMode = window.matchMedia(
     "(prefers-color-scheme: dark)"
@@ -38,10 +41,24 @@ toggle.addEventListener("change", function () {
   }
 });
 
-var imageAddrs = ["images/1.5mb.jpg", "images/7mb.jpg", "images/15mb.jpg"];
-var downloadSizes = [1551892, 7329546, 15833497]; //bytes
+var imageAddrs = [
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+];
+var downloadSizes = [
+  7654604, 7654604, 7654604, 7654604, 7654604, 7654604, 7654604, 7654604,
+  7654604, 7654604,
+]; //bytes
 var testIndex = 0;
-var maxTestDuration = 15000; // 15 seconds
+var maxTestDuration = 5000;
 
 function ShowProgressMessage(msg) {
   var oProgress = document.getElementById("progress");
@@ -52,13 +69,10 @@ function ShowProgressMessage(msg) {
 }
 
 function InitiateSpeedDetection() {
-  // Show loading indicator
   loadingIndicator.style.display = "block";
-  // Hide download speed display and button
   downloadSpeedDisplay.style.display = "none";
   checkSpeedButton.style.display = "none";
 
-  // Start speed test after 10 seconds
   setTimeout(MeasureConnectionSpeed, 5000);
 }
 
@@ -70,6 +84,13 @@ if (window.addEventListener) {
 
 function MeasureConnectionSpeed() {
   if (testIndex >= imageAddrs.length) {
+    downloadSpeedDisplay.innerHTML = `Download Speed: <br /><span class="speed_number">${highestSpeed.toFixed(
+      2
+    )}</span> <span class="bps">Mbps</span>`;
+    downloadSpeedDisplay.style.display = "block";
+    checkSpeedButton.style.display = "block";
+
+    loadingIndicator.style.display = "none";
     return;
   }
 
@@ -83,45 +104,39 @@ function MeasureConnectionSpeed() {
   };
 
   download.onerror = function () {
-    ShowProgressMessage("Invalid image, or error downloading");
+    if (retry < 3) {
+      retry++;
+      download.src = imageAddr + cacheBuster;
+    } else {
+      ShowProgressMessage("Failed to download image.");
+      testIndex++;
+      MeasureConnectionSpeed();
+    }
   };
 
   startTime = new Date().getTime();
   var cacheBuster = "?nnn=" + startTime;
   download.src = imageAddr + cacheBuster;
+  var retry = 0;
 
   function showResults() {
     var duration = (endTime - startTime) / 1000;
     var bitsLoaded = downloadSize * 8;
     var speedBps = bitsLoaded / duration;
-    var speedKbps = (speedBps / 1024).toFixed(2);
-    var speedMbps = (speedKbps / 1024).toFixed(2);
-    ShowProgressMessage([
-      "Your connection speed for the last test is:",
-      speedBps.toFixed(2) + " bps",
-      speedKbps + " kbps",
-      speedMbps + " Mbps",
-    ]);
+    var speedMbps = (speedBps / 1024 / 1024).toFixed(2);
+    highestSpeed = Math.max(highestSpeed, speedMbps);
+    successfulTests++;
     testIndex++;
-    // Update download speed display
-    downloadSpeedDisplay.innerHTML = `Download Speed: <br /><span class="speed_number">${speedMbps}</span> <span class="bps">Mbps</span>`;
-    // Show download speed display and button
-    downloadSpeedDisplay.style.display = "block";
-    checkSpeedButton.style.display = "block";
-    // Hide loading indicator
-    loadingIndicator.style.display = "none";
+    MeasureConnectionSpeed();
   }
 }
 
-// Add event listener to check speed button
 checkSpeedButton.addEventListener("click", function () {
-  // Reset testIndex to re-run speed tests
   testIndex = 0;
-  // Show loading indicator
+  highestSpeed = 0;
+  successfulTests = 0;
   loadingIndicator.style.display = "inline-block";
-  // Hide download speed display and button
   downloadSpeedDisplay.style.display = "none";
   checkSpeedButton.style.display = "none";
-  // Initiate speed detection
   InitiateSpeedDetection();
 });

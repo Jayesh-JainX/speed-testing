@@ -41,6 +41,10 @@ body {
     text-align: center;
     width: 100%;
   }
+
+  .speed_info .bps {
+    display: block;
+  }
 }
 
 .check_speed_button {
@@ -270,14 +274,12 @@ body.dark-mode {
   width: 50%;
 }
 
-/* Center the loading indicator */
 .loading_indicator {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Hide loading indicator initially */
 .loading_indicator {
   display: none;
 }
@@ -287,19 +289,18 @@ body.dark-mode {
   font-size: 175%;
 }
 
-/* Your existing CSS styles */
 .loading_indicator {
-  display: none; /* Hide loading indicator initially */
+  display: none;
 }
 
 .speed_number {
   font-size: 100px;
   font-weight: bold;
-  text-align: center; /* Center the text */
+  text-align: center;
 }
 
 footer {
-  text-align: right; /* Align center for all devices */
+  text-align: right;
   font-size: 15px;
   position: absolute;
 
