@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 // Speed test endpoint
 app.get("/speedtest", (req, res) => {
   // Execute speed test command
-  exec("speedtest-cli --simple", (error, stdout, stderr) => {
+  exec("python utils/speedtest.py --simple", (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).json({ error: "Internal Server Error" });
