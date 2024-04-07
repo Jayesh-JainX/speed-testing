@@ -1,9 +1,10 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const { MLabSpeedTest } = require("mlab-speed-test");
 const speedTest = new MLabSpeedTest();
 
-app.use(cors());
+app.use(cors()); // Add CORS middleware to enable Cross-Origin Resource Sharing
 
 app.get("/speed-test", (req, res) => {
   speedTest.on("download-complete", (downloadData) => {
