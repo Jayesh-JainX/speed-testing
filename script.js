@@ -56,9 +56,9 @@ var imageAddrs = [
 var downloadSizes = [
   7654604, 7654604, 7654604, 7654604, 7654604, 7654604, 7654604, 7654604,
   7654604, 7654604,
-]; //bytes
+];
 var testIndex = 0;
-var maxTestDuration = 5000;
+var maxTestDuration = 10000;
 
 function ShowProgressMessage(msg) {
   var oProgress = document.getElementById("progress");
@@ -73,7 +73,7 @@ function InitiateSpeedDetection() {
   downloadSpeedDisplay.style.display = "none";
   checkSpeedButton.style.display = "none";
 
-  setTimeout(MeasureConnectionSpeed, 5000);
+  MeasureConnectionSpeed();
 }
 
 if (window.addEventListener) {
@@ -81,6 +81,8 @@ if (window.addEventListener) {
 } else if (window.attachEvent) {
   window.attachEvent("onload", InitiateSpeedDetection);
 }
+
+var maxTestDuration = 10000;
 
 function MeasureConnectionSpeed() {
   if (testIndex >= imageAddrs.length) {
@@ -129,6 +131,15 @@ function MeasureConnectionSpeed() {
     testIndex++;
     MeasureConnectionSpeed();
   }
+
+  setTimeout(function () {
+    downloadSpeedDisplay.innerHTML = `Download Speed: <br /><span class="speed_number">${highestSpeed.toFixed(
+      2
+    )}</span> <span class="bps">Mbps</span>`;
+    downloadSpeedDisplay.style.display = "block";
+    checkSpeedButton.style.display = "block";
+    loadingIndicator.style.display = "none";
+  }, maxTestDuration);
 }
 
 checkSpeedButton.addEventListener("click", function () {
