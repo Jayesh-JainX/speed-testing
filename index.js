@@ -1,49 +1,40 @@
+// Required modules
 const express = require("express");
-const { MLabSpeedTest } = require("mlab-speed-test");
+const { exec } = require("child_process");
 
+// Express app
 const app = express();
-const speedTest = new MLabSpeedTest();
+const PORT = process.env.PORT || 3000;
 
-app.get("/speed", (req, res) => {
-  let speedData = {};
-
-  speedTest.on("server-chosen", (serverInfo) => {
-    speedData.location = serverInfo.location;
-  });
-
-  speedTest.on("download-complete", (downloadData) => {
-    speedData.downloadSpeed = downloadData.LastClientMeasurement
-      ? parseFloat(downloadData.LastClientMeasurement.MeanClientMbps.toFixed(2))
-      : 0;
-    sendResponse();
-  });
-
-  speedTest.on("upload-complete", (uploadData) => {
-    speedData.uploadSpeed = uploadData.LastServerMeasurement
-      ? (
-          (uploadData.LastServerMeasurement.TCPInfo.BytesReceived /
-            uploadData.LastServerMeasurement.TCPInfo.ElapsedTime) *
-          8
-        ).toFixed(2)
-      : 0;
-    sendResponse();
-  });
-
-  speedTest.run();
-
-  function sendResponse() {
-    // Check if all data has been collected
-    if (
-      speedData.hasOwnProperty("location") &&
-      speedData.hasOwnProperty("downloadSpeed") &&
-      speedData.hasOwnProperty("uploadSpeed")
-    ) {
-      res.json(speedData);
+// Speed test endpoint
+app.get("/speedtest", (req, res) => {
+  // Execute speed test command
+  exec("speedtest-cli --simple", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
-  }
+
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    // Parse speed test results
+    const results = {};
+    stdout.split("\n").forEach((line) => {
+      const parts = line.split(":");
+      if (parts.length === 2) {
+        results[parts[0].trim()] = parts[1].trim();
+      }
+    });
+
+    // Send speed test results to client
+    res.json(results);
+  });
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
