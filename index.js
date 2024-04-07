@@ -3,6 +3,8 @@ const app = express();
 const { MLabSpeedTest } = require("mlab-speed-test");
 const speedTest = new MLabSpeedTest();
 
+app.use(cors());
+
 app.get("/speed-test", (req, res) => {
   speedTest.on("download-complete", (downloadData) => {
     const downloadSpeed = downloadData.LastClientMeasurement
