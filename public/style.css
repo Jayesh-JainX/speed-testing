@@ -247,6 +247,18 @@ body.dark-mode {
   width: 50%;
 }
 
+/* Center the loading indicator */
+.loading_indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Hide loading indicator initially */
+.loading_indicator {
+  display: none;
+}
+
 .bps {
   font-weight: bold;
   font-size: 175%;

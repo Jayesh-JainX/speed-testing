@@ -38,15 +38,20 @@
         src="images/speed.png"
         alt="Your Image Description"
       />
+      <!-- Add IDs to elements -->
       <div class="speed_info">
-        <div class="download_speed">
+        <div class="download_speed" id="downloadSpeed">
           Download Speed: <br /><span class="speed_number">100</span>
           <span class="bps">Mbps</span>
         </div>
-        <div class="loading_indicator" style="display: none">
+        <div
+          class="loading_indicator"
+          id="loadingIndicator"
+          style="display: none"
+        >
           <img src="images/loading2.gif" alt="Loading Indicator" />
         </div>
-        <button class="check_speed_button">
+        <button class="check_speed_button" id="checkSpeedButton">
           <i class="bx bx-refresh"></i>
         </button>
       </div>
@@ -70,5 +75,6 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/speedtest-net"></script>
   </body>
 </html>

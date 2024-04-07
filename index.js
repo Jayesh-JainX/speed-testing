@@ -1,43 +1,55 @@
-const express = require("express");
-const path = require("path");
-const FastSpeedtest = require("fast-speedtest-api");
-const cors = require("cors");
+// Server-side code
+const WebSocket = require("ws");
 
-const app = express();
+const wss = new WebSocket.Server({ port: 8080 });
 
-app.use(express.static(path.join(__dirname, "public")));
+wss.on("connection", function connection(ws) {
+  ws.on("message", function incoming(message) {
+    console.log("received: %s", message);
+    console.log("message type:", typeof message);
 
-app.use(
-  cors({
-    origin: "https://speed-test-ic.vercel.app",
-  })
-);
+    if (message || message.type === "start-speed-test") {
+      console.log("yes");
+      ws.send(JSON.stringify({ type: "speed-test-started" }));
+      // Assuming you have the mlab-speed-test library installed
+      const { MLabSpeedTest } = require("mlab-speed-test");
+      const speedTest = new MLabSpeedTest();
 
-const speedtest = new FastSpeedtest({
-  token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm",
-  verbose: false,
-  timeout: 5000,
-  https: true,
-  urlCount: 5,
-  bufferSize: 8,
-  unit: FastSpeedtest.UNITS.Mbps,
-});
+      // Event listeners for speed test results
+      speedTest.on("server-chosen", (serverInfo) => {
+        console.log(serverInfo.location);
+      });
 
-// Define the endpoint to fetch speed
-app.get("/speed", (req, res) => {
-  speedtest
-    .getSpeed()
-    .then((speed) => {
-      console.log(`Speed: ${speed} Mbps`);
-      res.json({ speed: parseFloat(speed.toFixed(2)) });
-    })
-    .catch((error) => {
-      console.error("Error fetching speed:", error.message);
-      res.status(500).json({ error: "Failed to fetch speed" });
-    });
-});
+      speedTest.on("download-complete", (downloadData) => {
+        const downloadSpeed = downloadData.LastClientMeasurement
+          ? downloadData.LastClientMeasurement.MeanClientMbps.toFixed(2)
+          : "0";
+        console.log("Download Speed: " + downloadSpeed + "Mb/s");
+        // Send download speed result to client
+        ws.send(
+          JSON.stringify({ type: "downloadSpeedUpdate", speed: downloadSpeed })
+        );
+      });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+      speedTest.on("upload-complete", (uploadData) => {
+        const uploadSpeed = uploadData.LastServerMeasurement
+          ? (
+              (uploadData.LastServerMeasurement.TCPInfo.BytesReceived /
+                uploadData.LastServerMeasurement.TCPInfo.ElapsedTime) *
+              8
+            ).toFixed(2)
+          : "0";
+        console.log("Upload Speed: " + uploadSpeed + "Mb/s");
+        // Send upload speed result to client
+        ws.send(
+          JSON.stringify({ type: "uploadSpeedUpdate", speed: uploadSpeed })
+        );
+      });
+
+      speedTest.run();
+    }
+  });
+
+  ws.send(JSON.stringify({ message: "Connected to server" }));
+  console.log("connected");
 });
