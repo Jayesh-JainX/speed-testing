@@ -1,27 +1,33 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
 const { MLabSpeedTest } = require("mlab-speed-test");
 const speedTest = new MLabSpeedTest();
 
-app.use(cors()); // Add CORS middleware to enable Cross-Origin Resource Sharing
+let downloadSpeed = "0";
 
+// Endpoint to initiate speed test and return download speed
 app.get("/speed-test", (req, res) => {
-  speedTest.on("download-complete", (downloadData) => {
-    const downloadSpeed = downloadData.LastClientMeasurement
-      ? downloadData.LastClientMeasurement.MeanClientMbps.toFixed(2)
-      : "0";
-    console.log("Download Speed: " + downloadSpeed + "Mb/s");
-
-    // Send download speed result to client as part of the HTTP response
-    res.json({ downloadSpeed });
-  });
-
   // Run the speed test
-  speedTest.run().catch((error) => {
-    console.error("Error running speed test:", error);
-    res.status(500).json({ error: "Speed test failed" });
-  });
+  speedTest
+    .run()
+    .then(() => {
+      // Once the speed test is completed, send the download speed as the response
+      const currentDownloadSpeed =
+        downloadSpeed !== "0" ? downloadSpeed : "Speed test in progress";
+      res.json({ downloadSpeed: currentDownloadSpeed });
+    })
+    .catch((error) => {
+      console.error("Error running speed test:", error);
+      res.status(500).json({ error: "Speed test failed" });
+    });
+});
+
+// Event listener for download complete to update download speed
+speedTest.on("download-complete", (downloadData) => {
+  downloadSpeed = downloadData.LastClientMeasurement
+    ? downloadData.LastClientMeasurement.MeanClientMbps.toFixed(2)
+    : "0";
+  console.log("Download Speed: " + downloadSpeed + "Mb/s");
 });
 
 const PORT = process.env.PORT || 3000;
