@@ -1,33 +1,31 @@
 const express = require("express");
 const app = express();
 const { MLabSpeedTest } = require("mlab-speed-test");
-const speedTest = new MLabSpeedTest();
 
-let downloadSpeed = "0";
+// Initialize MLabSpeedTest with options
+const speedTest = new MLabSpeedTest({
+  ap: true, // Use automatic server selection
+  json: true, // Output results in JSON format
+  pretty: true, // Output results in human-readable format
+});
 
 // Endpoint to initiate speed test and return download speed
 app.get("/speed-test", (req, res) => {
   // Run the speed test
   speedTest
     .run()
-    .then(() => {
-      // Once the speed test is completed, send the download speed as the response
-      const currentDownloadSpeed =
-        downloadSpeed !== "0" ? downloadSpeed : "Speed test in progress";
-      res.json({ downloadSpeed: currentDownloadSpeed });
+    .then((result) => {
+      // Extract download speed from the result
+      const downloadSpeed = result.LastClientMeasurement
+        ? result.LastClientMeasurement.MeanClientMbps.toFixed(2)
+        : "0";
+      // Send download speed as the response
+      res.json({ downloadSpeed });
     })
     .catch((error) => {
       console.error("Error running speed test:", error);
       res.status(500).json({ error: "Speed test failed" });
     });
-});
-
-// Event listener for download complete to update download speed
-speedTest.on("download-complete", (downloadData) => {
-  downloadSpeed = downloadData.LastClientMeasurement
-    ? downloadData.LastClientMeasurement.MeanClientMbps.toFixed(2)
-    : "0";
-  console.log("Download Speed: " + downloadSpeed + "Mb/s");
 });
 
 const PORT = process.env.PORT || 3000;
