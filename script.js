@@ -43,20 +43,8 @@ toggle.addEventListener("change", function () {
 
 var imageAddrs = [
   "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
 ];
-var downloadSizes = [
-  7654604, 7654604, 7654604, 7654604, 7654604, 7654604, 7654604, 7654604,
-  7654604, 7654604,
-];
+var downloadSizes = [8000000];
 var testIndex = 0;
 var maxTestDuration = 10000;
 
@@ -85,61 +73,41 @@ if (window.addEventListener) {
 var maxTestDuration = 10000;
 
 function MeasureConnectionSpeed() {
-  if (testIndex >= imageAddrs.length) {
-    downloadSpeedDisplay.innerHTML = `Download Speed: <br /><span class="speed_number">${highestSpeed.toFixed(
-      2
-    )}</span> <span class="bps">Mbps</span>`;
-    downloadSpeedDisplay.style.display = "block";
-    checkSpeedButton.style.display = "block";
+  var startTime = new Date().getTime();
+  var endTime = startTime + maxTestDuration;
+  var highestSpeedInInterval = 0;
 
-    loadingIndicator.style.display = "none";
-    return;
+  function measureSpeedRepeatedly() {
+    var imageAddr = imageAddrs[0];
+    var downloadSize = downloadSizes[0];
+
+    var download = new Image();
+    download.onload = function () {
+      var duration = (new Date().getTime() - startTime) / 1000;
+      var bitsLoaded = downloadSize * 8;
+      var speedBps = bitsLoaded / duration;
+      var speedMbps = (speedBps / 1024 / 1024).toFixed(2);
+      highestSpeedInInterval = Math.max(highestSpeedInInterval, speedMbps);
+
+      if (new Date().getTime() < endTime) {
+        measureSpeedRepeatedly();
+      } else {
+        downloadSpeedDisplay.innerHTML = `Download Speed: <br /><span class="speed_number">${highestSpeedInInterval.toFixed(
+          2
+        )}</span> <span class="bps">Mbps</span>`;
+        downloadSpeedDisplay.style.display = "block";
+        checkSpeedButton.style.display = "block";
+        loadingIndicator.style.display = "none";
+      }
+    };
+
+    download.onerror = function () {};
+
+    var cacheBuster = "?nnn=" + new Date().getTime();
+    download.src = imageAddr + cacheBuster;
   }
 
-  var imageAddr = imageAddrs[testIndex];
-  var downloadSize = downloadSizes[testIndex];
-  var startTime, endTime;
-  var download = new Image();
-  download.onload = function () {
-    endTime = new Date().getTime();
-    showResults();
-  };
-
-  download.onerror = function () {
-    if (retry < 3) {
-      retry++;
-      download.src = imageAddr + cacheBuster;
-    } else {
-      ShowProgressMessage("Failed to download image.");
-      testIndex++;
-      MeasureConnectionSpeed();
-    }
-  };
-
-  startTime = new Date().getTime();
-  var cacheBuster = "?nnn=" + startTime;
-  download.src = imageAddr + cacheBuster;
-  var retry = 0;
-
-  function showResults() {
-    var duration = (endTime - startTime) / 1000;
-    var bitsLoaded = downloadSize * 8;
-    var speedBps = bitsLoaded / duration;
-    var speedMbps = (speedBps / 1024 / 1024).toFixed(2);
-    highestSpeed = Math.max(highestSpeed, speedMbps);
-    successfulTests++;
-    testIndex++;
-    MeasureConnectionSpeed();
-  }
-
-  setTimeout(function () {
-    downloadSpeedDisplay.innerHTML = `Download Speed: <br /><span class="speed_number">${highestSpeed.toFixed(
-      2
-    )}</span> <span class="bps">Mbps</span>`;
-    downloadSpeedDisplay.style.display = "block";
-    checkSpeedButton.style.display = "block";
-    loadingIndicator.style.display = "none";
-  }, maxTestDuration);
+  measureSpeedRepeatedly();
 }
 
 checkSpeedButton.addEventListener("click", function () {
