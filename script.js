@@ -42,9 +42,9 @@ toggle.addEventListener("change", function () {
 });
 
 var imageAddrs = [
-  "https://upload.wikimedia.org/wikipedia/commons/3/3a/Bloemen_van_adderwortel_%28Persicaria_bistorta%2C_synoniem%2C_Polygonum_bistorta%29_06-06-2021._%28d.j.b%29.jpg",
+  "https://notify-io.vercel.app/Cirrus_uncinus_clouds_in_the_morning_sky.jpg",
 ];
-var downloadSizes = [8000000];
+var downloadSizes = [500000];
 var testIndex = 0;
 var maxTestDuration = 10000;
 
